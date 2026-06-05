@@ -14,9 +14,11 @@ type Prediction = {
 };
 
 async function getPrediction(): Promise<Prediction | null> {
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
 
   try {
     const res = await fetch(`${baseUrl}/api/get-prediction`, {
@@ -28,7 +30,14 @@ async function getPrediction(): Promise<Prediction | null> {
       return null;
     }
 
-    return res.json();
+    const data = await res.json();
+
+    if (data?.error) {
+      console.error("Prediction API returned error:", data.error);
+      return null;
+    }
+
+    return data;
   } catch (error) {
     console.error("Prediction fetch error:", error);
     return null;
@@ -79,13 +88,16 @@ export default async function Home() {
       <main className="min-h-screen bg-neutral-950 text-white flex items-center justify-center p-6">
         <section className="w-full max-w-xl rounded-2xl bg-neutral-900 border border-neutral-800 p-6 shadow-xl">
           <p className="text-sm text-neutral-400">NBA Player Points Model</p>
+
           <h1 className="text-3xl font-bold mt-2">SGA Points Predictor</h1>
+
           <p className="mt-6 text-red-400">
             Could not load prediction from Supabase.
           </p>
+
           <p className="mt-2 text-sm text-neutral-500">
-            Check that /api/get-prediction works and that Supabase has the
-            sga_next_game row.
+            The API route works, so check the homepage fetch URL or redeploy
+            after updating environment variables.
           </p>
         </section>
       </main>
@@ -104,15 +116,25 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-neutral-950 text-white flex items-center justify-center p-6">
       <section className="w-full max-w-xl rounded-2xl bg-neutral-900 border border-neutral-800 p-6 shadow-xl">
-        <p className="text-sm text-neutral-400">NBA Player Points Model</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm text-neutral-400">NBA Player Points Model</p>
 
-        <h1 className="text-3xl font-bold mt-2">
-          {playerName} Points Predictor
-        </h1>
+            <h1 className="text-3xl font-bold mt-2">
+              {playerName} Points Predictor
+            </h1>
+          </div>
+
+          <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400 border border-emerald-500/20">
+            Live
+          </span>
+        </div>
 
         <div className="mt-8">
           <p className="text-neutral-400">Predicted Points</p>
-          <p className="text-6xl font-bold">{predictedPoints}</p>
+          <p className="text-6xl font-bold tracking-tight">
+            {predictedPoints}
+          </p>
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-4">
