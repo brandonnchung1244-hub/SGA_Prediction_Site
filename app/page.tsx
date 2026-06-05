@@ -1,3 +1,5 @@
+import RefreshButton from "./components/RefreshButton";
+
 type Prediction = {
   id: string;
   player_id?: string;
@@ -161,9 +163,13 @@ export default async function Home() {
           </div>
         </div>
 
-        <p className="mt-6 text-sm text-neutral-500">
-          Last updated: {updatedAt}
-        </p>
+        <div className="mt-6 flex items-center justify-between gap-4">
+          <p className="text-sm text-neutral-500">
+            Last updated: {updatedAt}
+          </p>
+          
+          <RefreshButton />
+        </div>
       </section>
     </main>
   );
